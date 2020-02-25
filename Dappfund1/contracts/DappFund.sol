@@ -26,6 +26,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
     address public tide; // ENS name can be set
     uint ProductsId;
     uint CreatorsId;
+    uint16 InvestorsId;
 
     enum Fund {fullyFunded, partiallyFunded, notFunded}
     // funding as received by creators
@@ -53,7 +54,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
     //products identification
     
     struct Creator { //creators details
-    mapping(uint => address) CreatorAddr;
+       address CreatorAddr;
         uint16 projectsDeployed;
         uint valueReceived;
         Success rate;
@@ -65,32 +66,19 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
 
     struct Investor {
         //investor details
-     mapping(uint => address) InvestorAddr;
-        bool investor;
+      address InvestorAddr;
         uint16 projectsDeployed;
+        mapping(address => uint16) balances
         uint valueInv;
         Active activity;
         State register;
     }
-  mapping(uint => Investor) InvestorId; // investor's identifcation
+  mapping(uint => Investor) investorId; // investor's identifcation
 
     struct Action {
         //uses ProductId to verify actions, can only be called by admin
        
     }
-
-
-
-
-contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
-    constructor() ERC721Full("Product", "PT") public {
-          /* Set tide to the creator of this contract */
-        tide = msg.sender;
-      // for circuit breaker pattern
-       bool private stopped = false;
-    }
-}
-
     /*_____________________________
      * 2. Modifiers
      *_____________________________
@@ -102,17 +90,17 @@ contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
     }
 
     modifier onlyInvestor(uint16 _id) {
-        require(InvestorsId[_id].register == 1, "Not registered as an investor");
+        require(nvestorsId[_id].register == 1, "Not registered as an investor");
         _;
     }
     
     modifier onlyCreator(uinti6 _id) {
-        require(CreatorsId[_id].register == 0, "Not registered as an Inventor");
+        require(creatorsId[_id].register == 0, "Not registered as an Inventor");
         _;
     }
 
     modifier whenAlive(uint16 _id) {
-        require(productsId[_id].activity  || creatorsId[_id].activity == 0, "account not active;
+        require(investorId[_id].activity  || creatorsId[_id].activity == 0, "account not active;
         _;
     }
     /*_____________________________
@@ -125,8 +113,16 @@ contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
      *_____________________________
      */
 
+    contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
 
 
+    constructor() ERC721Full("Product", "PT") public {
+          /* Set tide to the creator of this contract */
+        tide = msg.sender;
+      // for circuit breaker pattern
+       bool private stopped = false;
+    }
+}
      /**
       * Circuit breaker pattern
       */
@@ -152,22 +148,48 @@ contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
 
     Function registerInvestor(address indexed _Investor) {
         //The function allows an address to operate as an investor on the platform
-        State register == 1;
-        InvestorsId++;
+        _id =0 ;
+         investorAddr[id] = _Investor;
+         InvestorsId[_id].register == 1;
+        _id++;
     }
 
     function registerCreator(address indexed _Creator) {
         //Registers an addr. as a creator 
-        State register == 0; 
-        CreatorsId++;
+        _id = 0;
+        creatorsId[_id] = _Creator
+        creatorsId[_id].register == 0; 
+        _id++;
+    }
+    
+    
+    function createProduct(
+        /*
+        *create Product call the _minter function from ERC721
+        */
+
+        string memory title,
+        string memory description,
+        string memory location,
+        string memory organization,
+        uint startDate,
+        uint endDate)
+    public
+    onlyCreator(_id)
+    whenAlive
+    {
+        
+
+        uint256 productId = _getProductId();
+        _mint(msg.sender, productId);   
     }
 
 
-    function getProduct(uint productsId)
+    function getProduct(uint16 _id)
         public
         view
         returns (
-            uint id,
+            uinti6 id,
             string memory title,
             string memory description,
             string memory location,
@@ -176,20 +198,6 @@ contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
             uint endDate)
     {}
 
-    function createProduct(
-        string memory title,
-        string memory description,
-        string memory location,
-        string memory organization,
-        uint startDate,
-        uint endDate)
-    public
-    whenRunning
-    whenAlive
-    {
-        
-    }
-
     function getActionIdsByOpportunity(uint opportunityId)
         public
         view
@@ -197,6 +205,27 @@ contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
     {
             }
         }
+    }
+
+      function fundProject(uint16 id, address indexed CreatorAddr)
+      public 
+      payable
+      onlyInvestor()
+      whenAlive
+       { 
+           uint amount = msg.value;
+
+
+
+      }
+
+
+    function createAction(
+       )
+    public
+    whenRunning
+    whenAlive
+    {
     }
 
     function getAction(
@@ -208,15 +237,17 @@ contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
         returns (
           )
     {
-       
             }
-        }
-    }
 
-    function createAction(
-       )
-    public
-    whenRunning
-    whenAlive
-    {
+  /**
+   * @dev calculates the next token ID based on totalSupply
+   * @return uint256 for the next token ID
+   */
+  function _getProductId() private view returns (uint256) {
+    return totalSupply().add(1); 
+  }
+
+
+
+        }
     }
