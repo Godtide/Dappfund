@@ -23,7 +23,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
      */
 
     // Platform account address
-    address public tide; // ENS name can be set
+    address public platformOwner; // ENS name can be set
     uint ProductsId;
     uint CreatorsId;
     uint16 InvestorsId;
@@ -39,15 +39,17 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
 
     struct Product {
         //product details
-        uint id;
+        address creator
+        uint id ;// TokenID OR IP or index position of product in ProductsId;
         string title;
         string description;
         string ProjectPitchURL;
-        uint amountRequired;
-        uint amountReceived;
+        uint fundingRequired;
+        mapping(address => uint) balances;
         string organization;
-        uint startDate;
-        uint endDate;
+        bool isBlacklisted;
+        )
+
     }
 
     mapping(uint => Product) ProductId;
@@ -75,10 +77,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
     }
   mapping(uint => Investor) investorId; // investor's identifcation
 
-    struct Action {
-        //uses ProductId to verify actions, can only be called by admin
-       
-    }
+
     /*_____________________________
      * 2. Modifiers
      *_____________________________
@@ -107,6 +106,13 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
      * 3. Event Logs
      *_____________________________
      */
+      event LogForCreateProduct(msg.sender,_tokenID);
+      event LogForRegisterCreator( _creator);
+      event LogForRegisterInvestor( _investor)
+
+
+
+
 
      /*_____________________________
      * 4. Function definition
@@ -128,7 +134,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
       */
       function freeze() 
       public
-      onlyOwner() 
+      onlyPlatformOwner() 
       {
        stopped = true;    
       }
@@ -138,7 +144,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
       */
       function unfreeze() 
       public
-      onlyOwner() 
+      onlyPlatformOwner() 
       {
        stopped = false;    
       }
@@ -146,42 +152,56 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
      /***/
 
 
-    Function registerInvestor(address indexed _Investor) {
+    Function registerInvestor(address indexed _investor) {
         //The function allows an address to operate as an investor on the platform
         _id =0 ;
          investorAddr[id] = _Investor;
          InvestorsId[_id].register == 1;
         _id++;
+         emit LogForRegisterInvestor( _investor);
     }
 
-    function registerCreator(address indexed _Creator) {
+    function registerCreator(address indexed _creator) {
         //Registers an addr. as a creator 
         _id = 0;
         creatorsId[_id] = _Creator
         creatorsId[_id].register == 0; 
         _id++;
+        emit LogForRegisterCreator( _creator);
     }
     
     
-    function createProduct(
-        /*
-        *create Product call the _minter function from ERC721
+       /* @dev function creat product allows any registered creator 
+       *to add their product to the platform
+       *create Product call the _minter function from ERC721, every product is a non-fungible token
+       * The TokenId can be sold as IP
+       * at any price desirable by the owner
         */
 
-        string memory title,
+    function createProduct( 
+        string memory _title,
         string memory description,
-        string memory location,
-        string memory organization,
-        uint startDate,
-        uint endDate)
+        string memory projectPitchURL,
+        )
     public
+    pure
     onlyCreator(_id)
     whenAlive
     {
-        
-
-        uint256 productId = _getProductId();
-        _mint(msg.sender, productId);   
+        _id = 1;/*initializes the array index of the product in array productsId
+        * _id is initialized to 1 to match the tokenID
+        */
+        productsId[_id].address = msg.sender;
+        productsId[_id].id = _id; // synonmyous to TokenID OR IP;
+        productsId[_id].title = _title;//string title;
+        productsId[_id].description = _description;//string description;
+        productsId[_id].projectPitchUrl = _ProjectPitchURL;
+        products[_id][msg.sender].balances =0;
+        // productIn is also equal to _id or index 
+        uint256 _tokenId = _getProductId();
+        _mint(msg.sender, _tokendId); 
+        _id++;// INCREMENTS the id such that the next product is 2
+        emit LogForCreateProduct(msg.sender,_tokenID);
     }
 
 
@@ -194,18 +214,31 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
             string memory description,
             string memory location,
             string memory organization,
-            uint startDate,
-            uint endDate)
-    {}
-
-    function getActionIdsByOpportunity(uint opportunityId)
-        public
-        view
-        returns (string memory )
+            uint fundingRequired;
+            uint balances;
+            bool isBlacklisted,
+            )
     {
-            }
-        }
+            products[_id].id;
+            products[_id].title,
+            products[_id].description,
+            products[_id].isBlacklisted,
+            products[_id].balances;
+            products[_id].fundingRequired;
+            products[_id].isBlacklisted
     }
+
+
+    //check out pull payment method using balance
+    /* @ dev
+    *function FundProject
+    *Allows an investor(using Id) to fund the project they are interested in using the projectId,
+    *The function receives ether
+    * Removes amount from investorbalance into the Project's balance
+    *It can only be called by a registered investor
+    *It only be called when the investor or project is active
+    *emit an event
+    */
 
       function fundProject(uint16 id, address indexed CreatorAddr)
       public 
@@ -215,29 +248,27 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
        { 
            uint amount = msg.value;
 
-
-
       }
 
 
-    function createAction(
+
+
+      //
+      /*@dev
+      *This Function BLACLKIST can only be called by platOwner or admin
+      *This blacklist scams or inactive project using Project's Id
+      *emits an event
+      */
+
+    function Blacklist( _project's id
        )
-    public
-    whenRunning
-    whenAlive
+       private
+    isPlatformOwner
     {
+        isBlacklisted == true;
     }
 
-    function getAction(
-        string memory actionId)
-    public
-    view
-    whenRunning
-    whenAlive
-        returns (
-          )
-    {
-            }
+
 
   /**
    * @dev calculates the next token ID based on totalSupply
