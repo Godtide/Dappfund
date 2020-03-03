@@ -49,18 +49,15 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
         string organization;
         bool isBlacklisted;
         )
-
-    }
+     }
 
     mapping(uint => Product) ProductId;
     //products identification
     
     struct Creator { //creators details
        address CreatorAddr;
-        uint16 projectsDeployed;
-        uint valueReceived;
+        mapping(address => uint)balances;
         Success rate;
-        Funding raised;
         State register;
         Active activity;
     }
@@ -106,14 +103,14 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
      * 3. Event Logs
      *_____________________________
      */
-      event LogForCreateProduct(msg.sender,_tokenID);
-      event LogForRegisterCreator( _creator);
-      event LogForRegisterInvestor( _investor)
-
-
-
-
-
+      event LogForCreateProduct(address indexed msg.sender, uint16_tokenID);
+      event LogForUnfreeze(bool stopped);
+      event LogForFreeze(bool stopped);
+      event LogForRegisterCreator(address indexed _creator);
+      event LogForRegisterInvestor(address indexed _investor);
+      event LogForFundProject(uint balance, uint amount, address indexed creatorAddr);
+      event LogForTransferOwnership(address msg.sender, uint16 _tokenId, address _acct);
+      event LogForWithdraw(msg.sender, msg.value);
      /*_____________________________
      * 4. Function definition
      *_____________________________
@@ -136,7 +133,8 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
       public
       onlyPlatformOwner() 
       {
-       stopped = true;    
+       stopped = true;  
+       emit LogForFreeze(stopped);  
       }
 
       /**
@@ -147,12 +145,14 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
       onlyPlatformOwner() 
       {
        stopped = false;    
+       emit LogForUnFreeze(stopped);
       }
+     
 
      /***/
 
 
-    Function registerInvestor(address indexed _investor) {
+    function registerInvestor(address indexed _investor) {
         //The function allows an address to operate as an investor on the platform
         _id =0 ;
          investorAddr[id] = _Investor;
@@ -217,6 +217,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
             uint fundingRequired;
             uint balances;
             bool isBlacklisted,
+            Active activity
             )
     {
             products[_id].id;
@@ -226,6 +227,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
             products[_id].balances;
             products[_id].fundingRequired;
             products[_id].isBlacklisted
+            productsId[_id].activity
     }
 
 
@@ -235,23 +237,53 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
     *Allows an investor(using Id) to fund the project they are interested in using the projectId,
     *The function receives ether
     * Removes amount from investorbalance into the Project's balance
+    *requires investorbalance >= msg.value;
     *It can only be called by a registered investor
     *It only be called when the investor or project is active
     *emit an event
     */
 
-      function fundProject(uint16 id, address indexed CreatorAddr)
+      function fundProject(uint16 id, address indexed CreatorAddr)// checkout Pull payment
       public 
       payable
-      onlyInvestor()
+      pure
+      onlyInvestor(_id) // how to set modifier in the react interphase
       whenAlive
-       { 
+       {   
+           uint balance = 0;
+           balance = investorsId[_id][msg.sender].balances;
            uint amount = msg.value;
+           require(balance >= msg.value));
+           //checkout pull payment
+           balance -= amount;
+           productId[_id][creatorAddr].balances += amount;
+           emit LogForFundProject(balance, amount, creatorAddr);
 
       }
 
+      /*@ dev
+      *function withdraw, called by only a creator;
+      *payable function
+      *require msg.sender is the created the product
+      *requires that msg.value <= balances
+      */
 
+      function withdraw(msg.value;)
+      payable
+      pure
+      onlyCreator[_id]
+      {
+          uint amount = msg.value;
+          balances = productsId[_id][msg.sender].balances;
+          require(productsId[_id].address == creatorsId[_id].address; "creator's address does match products");
+          require(balances >= amount);
+           balances -= amount;
+           msg.sender.transfer(amount);
+           emit LogForWithdraw(msg.sender, msg.value);
 
+      }
+
+      
 
       //
       /*@dev
@@ -264,8 +296,8 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
        )
        private
     isPlatformOwner
-    {
-        isBlacklisted == true;
+    {   productsId[_id].isBlacklisted == true;
+        productsId[_id].activity == 2;
     }
 
 
@@ -278,7 +310,27 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
     return totalSupply().add(1); 
   }
 
+  /*@dev transfer ownwership of IP
+  * CALLS super.transfer
+  *calls super.approve
+  */
 
-
+  function _transferOwnerShip(address _acct, _tokenId) {
+      this.approve(_acct, _tokenId);
+      this.transfer(msg.sender, _tokenId, _acct);
+  }
+  emit LogForTransferOwnership(msg.sender, _tokenId, _acct)
         }
+
+
+     /* external payable revert function\
+     *exception handler
+      *reverts when a function not available is called
+      *payable
+      */
+      function ()
+      external
+      payable
+      {}
+
     }
