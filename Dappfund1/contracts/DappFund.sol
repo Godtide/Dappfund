@@ -2,13 +2,13 @@ pragma solidity >=0.4.21 <0.7.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
-import "/openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
+import "@openzeppelin/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
+
+contract Dappfund is ERC721Full, Ownable  {
 
 /*
- * The Dappfund contract keeps track of the viable products developers build that are investible and let them get
- and their actions after investments (i.e. grant, scholarship, trip, etc).
- *
+ * The Dappfund contract keeps track of the viable products developers build that are investible 
  * At the bottom of the contract you will find auxiliar functions upgraded and updated to work
  * properly with current comiler versions
  *
@@ -27,6 +27,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
     uint ProductsId;
     uint CreatorsId;
     uint16 InvestorsId;
+    bool private stopped = false;
 
     enum Fund {fullyFunded, partiallyFunded, notFunded}
     // funding as received by creators
@@ -39,7 +40,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
 
     struct Product {
         //product details
-        address creator
+        address creator;
         uint id ;// TokenID OR IP or index position of product in ProductsId;
         string title;
         string description;
@@ -48,7 +49,6 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
         mapping(address => uint) balances;
         string organization;
         bool isBlacklisted;
-        )
      }
 
     mapping(uint => Product) ProductId;
@@ -67,7 +67,7 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
         //investor details
       address InvestorAddr;
         uint16 projectsDeployed;
-        mapping(address => uint16) balances
+        mapping(address => uint16) balances;
         uint valueInv;
         Active activity;
         State register;
@@ -116,14 +116,12 @@ import "/openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol";
      *_____________________________
      */
 
-    contract Dappfund is ERC721Full, ERC721Mintable,Ownable,ERC721Burnable  {
-
 
     constructor() ERC721Full("Product", "PT") public {
           /* Set tide to the creator of this contract */
-        tide = msg.sender;
+        platformOwner = msg.sender;
       // for circuit breaker pattern
-       bool private stopped = false;
+       
     }
 }
      /**
