@@ -23,48 +23,48 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
 
     // Platform account address
     address public platformOwner; // ENS name can be set
-    uint ProductId;
-    uint16 CreatorId;
-    uint16 InvestorId;
+    uint pid;
+    uint16 cid;
+    uint16 iid;
     bool private stopped = false;
     bool register = false;
 
     enum Fund {fullyFunded, partiallyFunded, notFunded}
     // funding as received by creators
-    enum Active {active, inactive, dormant}
+    enum Active {Active, Inactive, Dormant}
     //state of investor before removal from the platform
-    enum State {creator, investor}
+    enum State {  Creator, Investor}
 
 
     struct Product {
         //product details
         address creator;
-        uint id ;// TokenID OR IP or index position of product in ProductsId;
+        uint pid ;// TokenID OR IP or index position of product in ProductsId;
         string title;
         string description;
-        string ProjectPitchURL;
+        string projectPitchURL;
         uint fundingRequired;
         mapping(address => uint) balances;
+        Active activity;
         string organization;
         bool isBlacklisted;
      }
 
-    mapping(uint => Product) ProductId;
+    mapping(uint => Product) productId;
     //products identification
     
     struct Creator { //creators details
-       address CreatorAddr;
+       address creatorAddr;
         mapping(address => uint)balances;
         bool register;
         Active activity;
         State state;
     }
-  mapping(uint => Creator) CreatorId; // creator's identification
+  mapping(uint => Creator) creatorId; // creator's identification
 
     struct Investor {
         //investor details
-      address InvestorAddr;
-        uint16 projectsDeployed;
+      address investorAddr;
         mapping(address => uint16) balances;
         uint valueInv;
         Active activity;
@@ -85,30 +85,31 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
     }
 
     modifier onlyInvestor() {
-        require(state == 1, "Not registered as an investor");
+        require(investorId[iid].state == State.Investor, "Not registered as an investor");
         _;
     }
     
+    
     modifier onlyCreator() {
-        require(state == 0, "Not registered as an Inventor");
+        require(creatorId[cid].state == State.Creator, "Not registered as an Inventor");
         _;
     }
 
     modifier whenAlive() {
-        require(investorId[_id].activity  || creatorsId[_id].activity == 2, "account not active");
+        require(creatorId[cid].activity == Active.Active, "account not active");
         _;
     }
     /*_____________________________
      * 3. Event Logs
      *_____________________________
      */
-      event LogForCreateProduct(address indexed creatorAddr, uint16 _tokenID);
+      event LogForCreateProduct(address indexed creatorAddr, uint _tokenID);
       event LogForUnfreeze(bool stopped);
       event LogForFreeze(bool stopped);
       event LogForRegisterCreator(address indexed _creator);
       event LogForRegisterInvestor(address indexed _investor);
-      event LogForFundProject(uint balance, uint amount, address indexed creatorAddr);
-      event LogForTransferOwnership(address creatorAddr, uint16 _tokenId, address _acct);
+      event LogForFundProject(uint balances, uint amount);
+      event LogForTransferOwnership(address indexed creatorAddr, address indexed _acct, uint _tokenId);
       event LogForWithdraw(address indexed creatorAddr, uint amount);
      /*_____________________________
      * 4. Function definition
@@ -144,7 +145,7 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
       isPlatformOwner() 
       {
        stopped = false;    
-       emit LogForUnFreeze(stopped);
+       emit LogForUnfreeze(stopped);
       }
      
 
@@ -156,11 +157,11 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
     isPlatformOwner()
     {
         //The function allows an address to operate as an investor on the platform
-        _id = 0 ;
-         investorsId[_id].InvestorAddr = _Investor;
-         InvestorsId[_id].register == 1;
-         state == 1;
-        _id++;
+        iid = 0 ;
+         investorId[iid].investorAddr = _investor;
+         investorId[iid].register = true;
+         investorId[iid].state = State.Investor;
+        iid++;
          emit LogForRegisterInvestor( _investor);
     }
 
@@ -169,11 +170,11 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
     isPlatformOwner
      {
         //Registers an addr. as a creator 
-        _id = 0;
-        creatorsId[_id] = _Creator;
-        creatorsId[_id].register == 0; 
-        state == 0;
-        _id++;
+        cid = 0;
+        creatorId[cid].creatorAddr = _creator;
+        creatorId[cid].register = true; 
+        creatorId[cid].state = State.Creator;
+        cid++;
         emit LogForRegisterCreator( _creator);
     }
     
@@ -187,54 +188,48 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
 
     function createProduct( 
         string memory _title,
-        string memory description,
-        string memory projectPitchURL
-        )
+        string memory _description,
+        string memory _projectPitchURL)
     public
-    pure
     onlyCreator()
     whenAlive
     {
-        _id = 1;/*initializes the array index of the product in array productsId
+        pid = 1;/*initializes the array index of the product in array productsId
         * _id is initialized to 1 to match the tokenID
         */
-        productsId[_id].creator = msg.sender;
-        productsId[_id].id = _id; // synonmyous to TokenID OR IP;
-        productsId[_id].title = _title;//string title;
-        productsId[_id].description = _description;//string description;
-        productsId[_id].projectPitchUrl = _ProjectPitchURL;
-        products[_id][msg.sender].balances =0;
+        productId[pid].creator = msg.sender;
+        productId[pid].pid = pid; // synonmyous to TokenID OR IP;
+        productId[pid].title = _title;//string title;
+        productId[pid].description = _description;//string description;
+        productId[pid].projectPitchURL = _projectPitchURL;
+        productId[pid].balances[msg.sender] = 0;
         // productIn is also equal to _id or index 
-        uint16 _tokenId = _getProductId();
-        _mint(msg.sender, _tokendId); 
-        _id++;// INCREMENTS the id such that the next product is 2
-        emit LogForCreateProduct(msg.sender,_tokenID);
+        uint _tokenId = _getProductId();
+        _mint(msg.sender, _tokenId); 
+        pid++;// INCREMENTS the id such that the next product is 2
+        emit LogForCreateProduct(msg.sender,_tokenId);
     }
 
 
-    function getProduct(uint16 _id)
+    function getProduct(uint16 _pid)
         public
         view
-        returns (
-            uint16 id,
+       returns (
             string memory title,
             string memory description,
-            string memory location,
-            string memory organization,
-            uint fundingRequired,
+            string memory projectPitchURL,
             uint balances,
+            uint fundingRequired,
             bool isBlacklisted,
-            Active activity
-            )
+            Active activity )
     {
-            products[_id].id;
-            products[_id].title;
-            products[_id].description;
-            products[_id].isBlacklisted;
-            products[_id].balances;
-            products[_id].fundingRequired;
-            products[_id].isBlacklisted;
-            productsId[_id].activity;
+            productId[_pid].title;
+            productId[_pid].description;
+            productId[_pid].projectPitchURL;
+            productId[_pid].balances;
+            productId[_pid].fundingRequired;
+            productId[_pid].isBlacklisted;
+            productId[_pid].activity;
     }
 
 
@@ -250,20 +245,19 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
     *emit an event
     */
 
-      function fundProject(uint16 id, address CreatorAddr)// checkout Pull payment
+      function fundProject(uint16 _pid, address _creatorAddr)// checkout Pull payment
       public 
       payable
       onlyInvestor() // how to set modifier in the react interphase
-      whenAlive
        {   
-           uint balance = 0;
-           balance = investorsId[_id][msg.sender].balances;
+           uint balanceOf = 0;
+           balanceOf = investorId[iid].balances[msg.sender];
            uint amount = msg.value;
-           require(balance >= msg.value);
+           require(balanceOf >= msg.value);
            //checkout pull payment
-           balance -= amount;
-           productId[_id][creatorAddr].balances += amount;
-           emit LogForFundProject(balance, amount, creatorAddr);
+           balanceOf -= amount;
+           productId[_pid].balances[_creatorAddr] += amount;
+           emit LogForFundProject(balanceOf, msg.value);
 
       }
 
@@ -280,10 +274,10 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
       onlyCreator()
       {
           uint amount = msg.value;
-          balances = productsId[_id][msg.sender].balances;
-          require(productsId[_id].creator == creatorsId[_id].creatorAddr, "creator's address does match products");
-          require(balances >= amount);
-           balances -= amount;
+          uint balanceOf = productId[pid].balances[msg.sender];
+          require(productId[pid].creator == creatorId[cid].creatorAddr, "creator's address does match products");
+          require(balanceOf >= amount);
+           balanceOf -= amount;
            msg.sender.transfer(amount);
            emit LogForWithdraw(msg.sender, msg.value);
 
@@ -298,11 +292,11 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
       *emits an event
       */
 
-    function Blacklist( uint _id)
+    function Blacklist( uint _pid)
        private
     isPlatformOwner()
-    {   productsId[_id].isBlacklisted == true;
-        productsId[_id].activity == 2;
+    {   productId[_pid].isBlacklisted == true;
+        productId[_pid].activity == Active.Dormant;
     }
 
 
@@ -320,15 +314,16 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
   *calls super.approve
   */
 
-  function transferOwnerShip(address _acct, uint16 _tokenId)
+  function transferOwnerShip(address _acct, uint _tokenId)
+  //tokenId is made synonmyous to the _productsID(_pid)
   public
   onlyCreator
    {
       this.approve(_acct, _tokenId);
-      this.transfer(msg.sender, _tokenId, _acct);
-      this._transferOwnership(_acct);
+      this.transferFrom(msg.sender, _acct, _tokenId);
+      this.transferOwnership(_acct);
 
-    emit LogForTransferOwnership(msg.sender, _tokenId, _acct);
+    emit LogForTransferOwnership(msg.sender, _acct, _tokenId);
   }
 
      /* external payable revert function\
