@@ -1,0 +1,78 @@
+.App {
+  text-align: center;
+  margin: 2rem;
+  font-family: 'Oswald';
+  background-color: #32262A;
+}
+
+.section {
+  text-align: left;
+  max-width: 720px;
+  margin: 4rem auto auto;
+}
+
+.drizzle-navbar {
+  background-color: #343a40;
+}
+
+.nav-link {
+  color: white!important;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background-color: #e05809;
+  border-color: #f58b11;
+}
+
+a {
+  color:  #ee7f0f;
+  height: 10vh;
+}
+a:hover {
+  color:  #141313;
+}
+
+.btn-primary:hover {
+  background-color: rgb(24, 5, 5);
+  border-color: rgb(19, 1, 2);
+}
+
+.drizzle-loader-container {
+  height: 100vh;
+}
+
+.drizzle-loader {
+  height: 100vh;
+}
+
+.drizzle-loader-text {
+  font-family: 'Oswald';
+  font-size: 1.5em;
+  height: 10vh;
+  text-align: center;
+  vertical-align: top;
+  color: #32262A;
+}
+
+.container {
+  display: grid;
+}
+
+.input-field {
+  display: flex;
+  align-items :scatter-around;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.input-field-btn{
+  display: flex;
+  align-items :flex-end;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 50%;
+}
+.page-footer{
+  background-color: rgb(163, 116, 45);
+}
