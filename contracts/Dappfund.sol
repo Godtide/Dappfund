@@ -4,10 +4,10 @@ import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
 import "@openzeppelin/contracts/ownership/Ownable.sol";
 
-contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
+contract Dappfund is ERC721Full, Ownable  {
 
 /*
- * The Dappfund contract keeps track of the viable products developers build on ethereum that are investible 
+ * The DappFund contract keeps track of the viable products developers build on ethereum that are investible 
  * At the bottom of the contract you will find auxiliar functions upgraded and updated to work
  * properly with current compiler versions
  *
@@ -27,9 +27,9 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
     uint16 cid;
     uint16 iid;
     bool private stopped = false;
-    bool register = false;
+    bool public register = false;
 
-    enum Fund {fullyFunded, partiallyFunded, notFunded}
+    //enum Fund {fullyFunded, partiallyFunded, notFunded}
     // funding as received by creators
     enum Active {Active, Inactive, Dormant}
     //state of investor before removal from the platform
@@ -43,7 +43,7 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
         string title;
         string description;
         string projectPitchURL;
-        uint fundingRequired;
+        //uint fundingRequired;
         mapping(address => uint) balances;
         Active activity;
         string organization;
@@ -103,11 +103,12 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
      * 3. Event Logs
      *_____________________________
      */
-      event LogForCreateProduct(address indexed creatorAddr, uint _tokenID);
+
+      event LogForFreeze(bool stopped); 
       event LogForUnfreeze(bool stopped);
-      event LogForFreeze(bool stopped);
-      event LogForRegisterCreator(address indexed _creator);
       event LogForRegisterInvestor(address indexed _investor);
+      event LogForRegisterCreator(address indexed _creator);
+      event LogForCreateProduct(address indexed creatorAddr, uint _tokenID);
       event LogForFundProject(uint balances, uint amount);
       event LogForTransferOwnership(address indexed creatorAddr, address indexed _acct, uint _tokenId);
       event LogForWithdraw(address indexed creatorAddr, uint amount);
@@ -117,9 +118,10 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
      */
 
 
-    constructor ()
+    constructor () 
     ERC721Full("Product", "PT")
-     public {
+    public
+      {
           /* Set tide to the creator of this contract */
         platformOwner = msg.sender;
       // for circuit breaker pattern
@@ -130,7 +132,7 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
       * Circuit breaker pattern
       */
       function freeze() 
-      public
+      private
       isPlatformOwner() 
       {
        stopped = true;  
@@ -141,7 +143,7 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
       * Circuit breaker pattern
       */
       function unfreeze() 
-      public
+      private
       isPlatformOwner() 
       {
        stopped = false;    
@@ -154,28 +156,30 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
 
     function registerInvestor(address _investor) 
     public
-    isPlatformOwner()
     {
         //The function allows an address to operate as an investor on the platform
         iid = 0 ;
+        //require(register ==false); to prevent reg as a investor and creator
          investorId[iid].investorAddr = _investor;
          investorId[iid].register = true;
          investorId[iid].state = State.Investor;
         iid++;
-         emit LogForRegisterInvestor( _investor);
+       // register == true;
+         emit LogForRegisterInvestor(msg.sender);
     }
 
     function registerCreator(address _creator)
-    private
-    isPlatformOwner
+    public
      {
         //Registers an addr. as a creator 
+       // require(register == false);
         cid = 0;
         creatorId[cid].creatorAddr = _creator;
         creatorId[cid].register = true; 
         creatorId[cid].state = State.Creator;
         cid++;
-        emit LogForRegisterCreator( _creator);
+       // register == true; global variable to prevent repeated reg
+        emit LogForRegisterCreator(msg.sender);
     }
     
     
@@ -185,6 +189,29 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
        * The TokenId can be sold as IP
        * at any price desirable by the owner
         */
+        
+
+    function getProduct(uint _pid)
+        public
+        view
+       returns (
+            uint pid,
+            string memory title,
+            string memory description,
+            string memory projectPitchURL,
+            uint balances,
+            bool isBlacklisted,
+            Active activity )
+    {
+            productId[_pid].pid;
+            productId[_pid].title;
+            productId[_pid].description;
+            productId[_pid].projectPitchURL;
+            productId[_pid].balances;
+          //  productId[_pid].fundingRequired;
+            productId[_pid].isBlacklisted;
+            productId[_pid].activity;
+    }
 
     function createProduct( 
         string memory _title,
@@ -194,43 +221,19 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
     onlyCreator()
     whenAlive
     {
-        pid = 1;/*initializes the array index of the product in array productsId
-        * _id is initialized to 1 to match the tokenID
-        */
+        pid = 0; 
         productId[pid].creator = msg.sender;
         productId[pid].pid = pid; // synonmyous to TokenID OR IP;
         productId[pid].title = _title;//string title;
         productId[pid].description = _description;//string description;
         productId[pid].projectPitchURL = _projectPitchURL;
         productId[pid].balances[msg.sender] = 0;
-        // productIn is also equal to _id or index 
         uint _tokenId = _getProductId();
         _mint(msg.sender, _tokenId); 
-        pid++;// INCREMENTS the id such that the next product is 2
+        pid++;
         emit LogForCreateProduct(msg.sender,_tokenId);
     }
 
-
-    function getProduct(uint16 _pid)
-        public
-        view
-       returns (
-            string memory title,
-            string memory description,
-            string memory projectPitchURL,
-            uint balances,
-            uint fundingRequired,
-            bool isBlacklisted,
-            Active activity )
-    {
-            productId[_pid].title;
-            productId[_pid].description;
-            productId[_pid].projectPitchURL;
-            productId[_pid].balances;
-            productId[_pid].fundingRequired;
-            productId[_pid].isBlacklisted;
-            productId[_pid].activity;
-    }
 
 
     //check out pull payment method using balance
@@ -248,9 +251,9 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
       function fundProject(uint16 _pid, address _creatorAddr)// checkout Pull payment
       public 
       payable
-      onlyInvestor() // how to set modifier in the react interphase
+      onlyInvestor() 
        {   
-           uint balanceOf = 0;
+           uint balanceOf;
            balanceOf = investorId[iid].balances[msg.sender];
            uint amount = msg.value;
            require(balanceOf >= msg.value);
@@ -297,15 +300,18 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
     isPlatformOwner()
     {   productId[_pid].isBlacklisted == true;
         productId[_pid].activity == Active.Dormant;
-    }
-
+        
+         }
 
 
   /**
    * @dev calculates the next token ID based on totalSupply
    * @return uint256 for the next token ID
    */
-  function _getProductId() private view returns (uint256) {
+  function _getProductId() 
+  public 
+  view 
+  returns (uint256) {
     return totalSupply().add(1); 
   }
 
@@ -313,15 +319,17 @@ contract Dappfund is ERC721Full, ERC721Mintable, Ownable  {
   * CALLS super.transfer
   *calls super.approve
   */
+  
 
   function transferOwnerShip(address _acct, uint _tokenId)
   //tokenId is made synonmyous to the _productsID(_pid)
   public
+  //should be payable in the future
   onlyCreator
    {
-      this.approve(_acct, _tokenId);
-      this.transferFrom(msg.sender, _acct, _tokenId);
-      this.transferOwnership(_acct);
+      super.approve(_acct, _tokenId);
+      super.transferFrom(msg.sender, _acct, _tokenId);
+      super.transferOwnership(_acct);
 
     emit LogForTransferOwnership(msg.sender, _acct, _tokenId);
   }

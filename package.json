@@ -1,8 +1,8 @@
 {
-  "name": "Dappfund",
+  "name": "drizzle-box",
   "version": "1.0.0",
-  "description": "Bring you idea to the world managed on ethereum",
-  "main": "truffle.js",
+  "description": "",
+  "main": "truffle-config.js",
   "directories": {
     "test": "test"
   },
@@ -11,18 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Godtide/Dappfund.git"
+    "url": "git+https://github.com/truffle-box/drizzle-box.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Godtide/Dappfund/issues"
+    "url": "https://github.com/truffle-box/drizzle-box/issues"
   },
-  "homepage": "https://github.com/Godtide/Dappfund#readme",
+  "homepage": "https://github.com/truffle-box/drizzle-box#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^2.5.0",
-    "openzeppelin-solidity": "2.5.0"
-  },
-  "devDependencies": {}
+    "@openzeppelin/contracts": "^2.4.0"
+  }
 }
