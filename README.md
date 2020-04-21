@@ -5,7 +5,7 @@ This project is a simple Dapp that allow a user to receive funding for their ide
 
 > Simple dapp project using **Drizzlehooks**
 > by **Tide Ayoade** 
-
+> Ref Nestor
 ## Prerequisites 
 > To engage with **Dappfund** you will need the following:
 
