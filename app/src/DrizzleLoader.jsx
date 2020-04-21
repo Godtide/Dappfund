@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Lottie from 'react-lottie'
-import animationData from './assets/drizzleLogo.json'
+import animationData from './assets/3129-idea-bulb.json'
+ 
+
 
 const { useDrizzleState } = drizzleReactHooks; 
-
 const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -25,7 +26,8 @@ function LoadingContainer({children}) {
                     height={'70%'}
                     width={400}
                 />
-                <div className="drizzle-loader-text">Loading...</div>
+             <div className="drizzle-loader-text">Loading ...</div>
+
             </main>
         )
     } return(

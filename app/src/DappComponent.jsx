@@ -1,22 +1,29 @@
 import React from "react";
 
-import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { Switch, Route, BrowserRouter as Router} from 'react-router-dom';
 
+
+
+import Investors from './components/dashboard/investor.component';
 import Navbar from "./components/layouts/navbar.component";
-import MainPage from './components/pages/mainPage.component';
-import SecondaryPage from "./components/pages/secondaryPage.component";
+import Footer from "./components/layouts/footer.component";
+import ProductDetails from "./components/pages/productDetails.component";
+import ProductCreate from "./components/pages/creator.component";
 
 const DappComponent = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <div className="App">
         <Navbar />
         <Switch>
-          <Route exact path='/' component={MainPage} />
-          <Route path='/secondary' component={SecondaryPage} />
+           <Route exact path='/' component={Investors}/>
+          <Route path='product/:pid' render={(props) => <ProductDetails {...props}/>} />
+          <Route path='/create' component={ProductCreate}/>
         </Switch>
+        <hr/>
+       <Footer />
       </div>
-    </BrowserRouter>
+    </Router>
   )
 }
 

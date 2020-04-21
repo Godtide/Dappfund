@@ -1,12 +1,12 @@
-# DRIZZLE USING REACT HOOKS
-> Project example using **Drizzle**
-> by **Nestor Bonilla**
+# DappfUND
+> Simple project using **Drizzlehooks**
+> by **Tide Ayoade**
 
-This project is a DApp template that use the features of Drizzle Hooks to manage state in a smooth way to interact with the Blockchain.
+This project is a simple Dapp that allow a user to receive funding for their ideas using ethereum Blockchain.
 
 
 ## Prerequisites 
-> To engage with **DRIZZLE USING REACT HOOKS** you will need the following:
+> To engage with **Dappfund** you will need the following:
 
 * NodeJS ([https://nodejs.org/en/](https://nodejs.org/en/))
 	> npm install nodejs
@@ -59,7 +59,7 @@ Having configured your Truffle & Ganache settings correctly, you'll need to add 
 ## Deployment
 >  Assuming you have set up all of the above correctly, with a test-net in the back running on port 7545, we can continue and deploy our main contract.
 >  
-Use truffle to migrate the main contract `SimpleStorage.sol`. This can be done by running the following commands in the root directory of the project:
+Use truffle to migrate the main contract `Dappfund.sol`. This can be done by running the following commands in the root directory of the project:
 
 > $ truffle migrate
 
@@ -68,7 +68,7 @@ Then we change into the client directory by executing `cd app` and install the n
 >
 Having successfully installed everything within the client directory, we execute `npm start` to boot up the front-end locally.
 
-##  Unit Tests
+##  Unit Tests // Not done yet
 To test with truffle you can execute the following command:
 > $ truffle test
 
@@ -79,3 +79,5 @@ To test with truffle you can execute the following command:
 > A specific consideration this project proposes is the interaction between the blockchain and the ux withouth the need of a third party database.
 
 > A final consideration this project propose is a workflow to interact with the blockchain through different pages managed by `react-router-dom`.
+
+**Ref Nestor**

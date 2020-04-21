@@ -1,5 +1,5 @@
-const SimpleStorage = artifacts.require("SimpleStorage");
+const Dappfund = artifacts.require("Dappfund");
 
 module.exports = function(deployer) {
-  deployer.deploy(SimpleStorage);
+  deployer.deploy(Dappfund);
 };

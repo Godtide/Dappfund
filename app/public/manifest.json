@@ -1,5 +1,5 @@
 {
-    "short_name": "Drizzle Dapp",
+    "short_name": "DappFund",
     "name": "Drizzle React Dapp Sample",
     "icons": [
       {
@@ -13,4 +13,5 @@
     "theme_color": "#000000",
     "background_color": "#ffffff"
   }
+  
   
