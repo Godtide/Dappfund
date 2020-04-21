@@ -1,4 +1,4 @@
-# DappfUND 
+# Dappfund
 
 This project is a simple Dapp that allow a user to receive funding for their ideas using ethereum Blockchain.
 
