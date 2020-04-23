@@ -53,4 +53,3 @@ To test with truffle you can execute the following command:
 
 > A final consideration this project interacts with the blockchain on multiple pages using `react-router-dom`.
 
-**Ref Nestor**
