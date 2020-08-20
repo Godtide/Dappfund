@@ -1,10 +1,10 @@
 # DappfUND 
 
-This project is a simple Dapp that allow a user to receive funding for their ideas using ethereum Blockchain.
+This project is a simple Dapp that allows underrepresented founders to receive funding for their ideas using ethereum Blockchain.
 
 
 > Simple dapp project using **Drizzlehooks**
-> by **Tide Ayoade**  Ref: Nestor
+> by **Tide Ayoade** 
 
 ## Prerequisites 
 > To engage with **Dappfund** you will need the following:
@@ -43,7 +43,7 @@ Then we change into the client directory by executing `cd app` and install the n
 >
 Having successfully installed everything within the client directory, we execute `npm start` to boot up the front-end locally.
 
-##  Unit Tests // Not done yet
+##  Unit Tests // to be completed
 To test with truffle you can execute the following command:
 > $ truffle test
 
@@ -53,4 +53,8 @@ To test with truffle you can execute the following command:
 
 > A final consideration this project interacts with the blockchain on multiple pages using `react-router-dom`.
 
-**Ref Nestor**
+>FORK
+>IMPROVE
+>MAKE A PR
+
+

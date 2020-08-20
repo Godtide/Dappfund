@@ -13,6 +13,15 @@ export default function Investors() {
     const [products, setProducts] = useState([]);
 
 
+    //  Better still to get product
+     const checkProduct = async () => {   
+       const newProd = await drizzle.contracts.Dappfund.methods.productsId(
+            //registration will be payable in the future
+            stateApp['int'] ).call();
+            setProducts(newProd)
+
+        }
+
     async function getProduct() {
         const newProduct = await drizzle.contracts.Dappfund.methods.getProduct(0).call();
         setProducts({
@@ -104,6 +113,18 @@ export default function Investors() {
                     </div>
                 </div>
             </div>
+
+            <form onSubmit={handleSubmit} className="white">
+          <div className="input-field">
+             <label htmlFor="address">Address</label>
+             <input type="number" id="int" onChange={handleChange}
+             placeholder={"Index no of product"} />
+          </div>
+          <div className="input-field-btn">
+             <button value="Submit" onClick={checkProduct} 
+             className="white">product details</button>
+          </div>
+       </form>
 
             <form onSubmit={handleSubmit} className="white">
           <div className="input-field">
