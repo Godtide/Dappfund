@@ -8,8 +8,6 @@ contract Dappfund is ERC721Full, Ownable  {
 
 /*
  * The DappFund contract keeps track of the viable products developers build on ethereum that are investible 
- * At the bottom of the contract you will find auxiliar functions upgraded and updated to work
- * properly with current compiler versions
  *
  * The original functions were published by
  * @author Tide Ayoade <ayoadebabatide@gmail.com>
@@ -49,6 +47,8 @@ contract Dappfund is ERC721Full, Ownable  {
         string organization;
         bool isBlacklisted;
      }
+
+    Product[] public products;
 
     mapping(uint => Product) productId;
     //products identification
@@ -118,14 +118,13 @@ contract Dappfund is ERC721Full, Ownable  {
      */
 
 
-    constructor () 
-    ERC721Full("Product", "PT")
+    constructor () ERC721Full("Product", "PT")
     public
       {
           /* Set tide to the creator of this contract */
         platformOwner = msg.sender;
-      // for circuit breaker pattern
-       
+        createProduct("test", "this is a test", "www.test.com");
+    }
     }
 
      /**
@@ -183,13 +182,8 @@ contract Dappfund is ERC721Full, Ownable  {
     }
     
     
-       /* @dev function creat product allows any registered creator 
-       *to add their product to the platform
-       *create Product call the _minter function from ERC721, every product is a non-fungible token
-       * The TokenId can be sold as IP
-       * at any price desirable by the owner
-        */
-        
+    /* 
+   call productId instead of getProduct
 
     function getProduct(uint _pid)
         public
@@ -211,7 +205,18 @@ contract Dappfund is ERC721Full, Ownable  {
           //  productId[_pid].fundingRequired;
             productId[_pid].isBlacklisted;
             productId[_pid].activity;
-    }
+    } 
+    */
+
+
+
+       /* @dev function creat product allows any registered creator 
+       *to add their product to the platform
+       *create Product call the _minter function from ERC721, every product is a non-fungible token
+       * The TokenId can be sold as IP
+       * at any price desirable by the owner
+      */
+
 
     function createProduct( 
         string memory _title,

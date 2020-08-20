@@ -14,16 +14,19 @@ export default function Investors() {
 
 
     async function getProduct() {
-       const productsId = [];
-       for (const i of products) {
-        const newProduct = await drizzle.contracts.Dappfund.methods.getProduct(i).call();
-       productsId.push(newProduct);   
-       }
-       setProducts(productsId);
-      }
-    
-
+        const newProduct = await drizzle.contracts.Dappfund.methods.getProduct(0).call();
+        setProducts({
+            pid: newProduct[0],
+            title: newProduct[1],
+            description: newProduct[2],
+            projectPitchURL: newProduct[3],
+            balances: newProduct[4],
+            isBlacklisted: newProduct[5].toString(),
+            activity: newProduct[6]
+        })
+ 
      console.log(products);
+    }
     
     useEffect( () => {
         getProduct()
@@ -87,7 +90,7 @@ export default function Investors() {
             <div className="row">
                 <div className="col s12 m12">
                     <div className="product-list section">
-                        {[products].map(product => (
+                        {products.map(product => (
                            <div key={product.pid} className="card project-summary">
                                 <div key={product.pid} className="card-content grey-text text-darken-3">
                                     <span className="card-title"><Link to={`/product/${product.pid}`} >Title: {product.title}</Link></span>
